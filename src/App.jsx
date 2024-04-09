@@ -3,10 +3,10 @@ import Chai from "./Chai"
 import Surya from "./Surya"
 
 function App() {
-
+  const username = "surya"
   return (
     <>
-      <h1>chai aur code</h1>
+      <h1>chai aur code {username} </h1>
       <Chai />
       <Surya />
     </>
