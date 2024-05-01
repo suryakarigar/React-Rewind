@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import './App.css'
 
 function App() {
@@ -7,19 +7,39 @@ function App() {
   const [specialCharAllowed, setSpecialCharAllowed] = useState(false)
   const [password, setPassword] = useState('')
 
+  // useRef hook
+  // const passwordRef = useRef(null)
+  const passwordRef = useRef(null)
+
   const passwordGenerator = useCallback(() => {
-    const pass = ""
+    let pass = ""
     let str = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
     if(numAllowed) str += '0123456789'
-    if(setSpecialCharAllowed) str += '!@#$%^&*-_+='
+    if(specialCharAllowed) str += '!@#$%^&*-_+='
 
-    for (let i = 1; i <= length.length; i++) {
+    for (let i = 1; i <= length; i++) {
       const index = Math.floor(Math.random() * str.length + 1);
-      char = str.charAt(index)
+      pass += str.charAt(index)
     }
 
-    setPassword(char)
+    setPassword(pass)
   }, [length, numAllowed, specialCharAllowed, setPassword])
+
+  // const copyPasswordToClipboard = useCallback( () => {
+  //   passwordRef.current?.select();
+  //   passwordRef.current?.setSelectionRange(0, 20);
+  //   window.navigator.clipboard.writeText(password)
+  // }, [password] )
+
+  const copyPasswordToClipboard = useCallback(() => {
+    passwordRef.current?.select();
+    passwordRef.current?.setSelectionRange(0,30);
+    window.navigator.clipboard.writeText(password)
+  },[password] )
+
+  useEffect( () => {
+    passwordGenerator();
+  },[length, numAllowed, specialCharAllowed, passwordGenerator] )
 
  
   return (
@@ -27,15 +47,19 @@ function App() {
       <div className='w-full max-w-md mx-auto py-2 rounded-xl text-orange-500 bg-gray-600'>
         <div className='w-full gap-2'>
           <input 
-          type="password" 
+          type="text" 
           name="password" 
           id="password"
+          value={password}
           placeholder='Password'
+          readOnly
+          // ref={passwordRef}
+          ref={passwordRef}
           className='px-3 py-1 rounded-md ml-3 m-3'/>
-          <button className='bg-blue-400 text-white px-3 py-1 rounded-md'>Copy</button>
+          <button onClick={copyPasswordToClipboard} className='bg-blue-400 text-white px-3 py-1 rounded-md'>Copy</button>
         </div>
-        <div className='flex justify-center'>
-          <div>
+        <div className='flex justify-center align-middle'>
+          <div className='flex justify-center align-middle mr-4'>
             <input 
             type="range" 
             name="input_range" 
@@ -48,7 +72,7 @@ function App() {
             />
             <label>Length: {length}</label>
           </div>
-          <div>
+          <div className='flex justify-center align-middle mr-4'>
             <input 
             type="checkbox" 
             defaultChecked={specialCharAllowed}
@@ -57,7 +81,7 @@ function App() {
             value={length}
             className='cursor-pointer'
             onChange={() => {
-                numAllowed((prev) => !prev)
+                setNumAllowed((prev) => !prev)
             }}
             />
             <label>Numbers</label>
